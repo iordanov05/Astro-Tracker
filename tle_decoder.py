@@ -1,5 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 current_year = datetime.now().year
+
+def convert_epoch_to_date(epoch):
+    day_of_year = int(epoch.split('.')[0])
+    fraction_of_day = float("0." + epoch.split('.')[1])
+
+    current_year = datetime.now().year
+    epoch_date = datetime(year=current_year, month=1, day=1) + timedelta(days=day_of_year) + timedelta(seconds=fraction_of_day*24*60*60)
+    formatted_date = epoch_date.strftime("%d.%m.%Y")
+    formatted_time = epoch_date.strftime("%H:%M:%S")
+    return f"{formatted_date}, {formatted_time}"
 
 
 def parse_tle(tle_text):
@@ -16,7 +26,7 @@ def parse_tle(tle_text):
             "Номер запуска в году": line1[11:14].lstrip('0'),
             "Фрагмент запуска": line1[14:17],
             "Год эпохи": str(int(line1[18:20]) + 1900 if int(line1[18:20]) > current_year - 2000 else int(line1[18:20]) + 2000),
-            "Эпоха": line1[20:32], 
+            "Эпоха": convert_epoch_to_date(line1[20:32]), 
             "Первая производная среднего движения по времени": line1[33:43],
             "Вторая производная среднего движения по времени": line1[45:52],
             "Коэффициент торможения (BSTAR)": line1[53:61],
