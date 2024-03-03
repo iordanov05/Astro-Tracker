@@ -11,6 +11,16 @@ def convert_epoch_to_date(epoch):
     formatted_time = epoch_date.strftime("%H:%M:%S")
     return f"{formatted_date}, {formatted_time}"
 
+def compute_checksum(tle_line):
+    summ=''
+    tle_line=tle_line[:-1]
+    for i in tle_line:
+        if i.isdigit()==0 and i != "-":
+            tle_line = tle_line.replace(i, '0')
+        elif i == "-":
+            tle_line = tle_line.replace(i, '1')
+    summ = str(sum(list(map(int, tle_line.strip()))))[-1]
+    return summ
 
 def parse_tle(tle_text):
     t_lines = tle_text.split('\n')
@@ -32,7 +42,7 @@ def parse_tle(tle_text):
             "Коэффициент торможения (BSTAR)": line1[53:61],
             "Тип эфемериды (орбитальная модель)": "SGP4/SDP4 (default)", 
             "Номер набора элементов": line1[63:68],
-            "Контрольная сумма": line1[68]
+            "Контрольная сумма": str(f"{line1[68]} - Контрольная сумма верна!" if compute_checksum(line1) == line1[68] else 	f"{line1[68]} - Неверная контрольная сумма!"), 
         },
         "Строка 2": {
             "Номер ИСЗ": line2[2:7],
@@ -44,7 +54,7 @@ def parse_tle(tle_text):
             
             "Среднее движение [оборотов в день]": line2[52:63],
             "Номер витка": line2[63:68], 
-            "Контрольная сумма":line2[68] 
+            "Контрольная сумма": str(f"{line2[68]} - Контрольная сумма верна!" if compute_checksum(line2) == line2[68] else f"{line2[68]} - Неверная контрольная сумма!"),
         }
     }
 
