@@ -1,9 +1,10 @@
 <script>
 import Header_main from './components/Header_main.vue'
 import App from './components/Map.vue'
+import Side_panel from './components/Side_panel.vue'
 
 export default{
-    components: {Header_main, App}
+    components: {Header_main, App, Side_panel}
 }
 
 </script>
@@ -15,6 +16,7 @@ export default{
     <main>
         <div className="main_part">
             <App></App>
+            <Side_panel></Side_panel>
         </div>
         
     </main>
