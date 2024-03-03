@@ -2,9 +2,10 @@
 import Header_main from './components/Header_main.vue'
 import Map from './components/Map.vue'
 import Side_panel from './components/Side_panel.vue'
+import Time_stamp from './components/Time_stamp.vue'
 
 export default{
-    components: {Header_main, Map, Side_panel}
+    components: {Header_main, Map, Side_panel, Time_stamp}
 }
 
 </script>
@@ -15,10 +16,12 @@ export default{
     </header>
     <main>
         <div className="main_part">
-            <Map></Map>
+            <div className="all">
+                <Map></Map>
+                <Time_stamp></Time_stamp>
+            </div>
             <Side_panel></Side_panel>
         </div>
-        
     </main>
     <footer>
 
@@ -26,15 +29,26 @@ export default{
 </template>
 
 <style scoped>
+
 .header_header{
     box-shadow: 0 4px 10px 15px rgba(0, 0, 0, 0.35);
     background: #17364b;
     padding: 15px 20px 7px 35px
 }
+
+.all{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
 .main_part{
     display: flex;
     flex-direction: row;
-    gap: 10px;
-    padding: 20px;
+    gap: 20px;
+    padding: 20px
 }
+
 </style>

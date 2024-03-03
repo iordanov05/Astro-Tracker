@@ -108,7 +108,7 @@
 }
 
 .satellite_img{
-    margin-top: 20%;
+    margin-top: 40%;
     width: 60%;
     max-width: 250px;
     transform: scaleY(-1);

@@ -5,7 +5,7 @@
 <style scoped>
 
 .map_wrapper{
-        max-width: 80%;
+        max-width: 100%;
         min-width: 500px;
         display: flex;
         align-items: center;
