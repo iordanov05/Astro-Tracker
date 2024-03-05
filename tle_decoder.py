@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from tle import grouped_lines_array
 current_year = datetime.now().year
 
 def convert_epoch_to_date(epoch):
@@ -28,7 +29,7 @@ def parse_tle(tle_text):
     line1 = t_lines[1]
     line2 = t_lines[2]
     satellite_data = {
-        "Спутник": satellite_name,
+        "Спутник": satellite_name.lstrip('"'),
         "Строка 1": {
             "Номер ИСЗ": line1[2:7],
             "Классификация": line1[7],
@@ -45,7 +46,6 @@ def parse_tle(tle_text):
             "Контрольная сумма": str(f"{line1[68]} - Контрольная сумма верна!" if compute_checksum(line1) == line1[68] else 	f"{line1[68]} - Неверная контрольная сумма!"), 
         },
         "Строка 2": {
-            "Номер ИСЗ": line2[2:7],
             "Наклонение, i": line2[8:16],
             "Прямое восхождение восходящего узла, Ω": line2[17:25],
             "Эксцентриситет, e": f"0.{line2[26:33]}",
@@ -59,18 +59,16 @@ def parse_tle(tle_text):
     }
 
     return satellite_data
-tle_data = """SITRO-AIS-6 (CHIRKIN)
-1 57192U 23091AC  24061.87562790  .00006122  00000-0  41742-3 0  9998
-2 57192  97.6293 115.0895 0019494 125.2711 235.0344 15.06449074 37334
-"""
-parsed_tle = parse_tle(tle_data)
 
-    
-for key, value in parsed_tle.items():
-    print(key + ":")
-    if isinstance(value, dict):
-        for sub_key, sub_value in value.items():
-            print(f"   {sub_key}: {sub_value}")
-    else:
-        print(f"   {value}")
-    print()
+array_of_parsed_tle_array = []
+for tle_data in grouped_lines_array:
+    parsed_tle_array = []
+    parsed_tle = parse_tle(tle_data)
+    for key, value in parsed_tle.items():
+        if isinstance(value, dict):
+            sub_values = list(value.values())
+            parsed_tle_array.extend(sub_values)
+        else:
+            parsed_tle_array.append(value)
+    array_of_parsed_tle_array.append(parsed_tle_array)
+array_of_parsed_tle_array = sorted(array_of_parsed_tle_array, key=lambda x: x[0])
