@@ -1,12 +1,21 @@
 import psycopg2
 from tle_decoder import array_of_parsed_tle_array
- 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+username = os.getenv("USERNAME")
+userpassword = os.getenv("USERPASSWORD")
+database = os.getenv("DBNAME")
+host = os.getenv("HOST")
+port = os.getenv("PORT")
+
 conn = psycopg2.connect(
-    dbname="",
-    user="",
-    password="",
-    host="",
-    port="" 
+    user=username,
+    password=userpassword,
+    dbname=database,
+    host=host,
+    port=port
 )
 
 cur = conn.cursor()
@@ -77,4 +86,3 @@ for element_of_array in array_of_parsed_tle_array:
 conn.commit()
 cur.close()
 conn.close()
-
