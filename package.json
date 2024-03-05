@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "pg": "^8.11.3",
     "vue": "^3.4.15"
   },
   "devDependencies": {
