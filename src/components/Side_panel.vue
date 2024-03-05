@@ -1,18 +1,39 @@
+<script>
+    export default{
+        data(){
+            return{
+                showButton: true,
+                selectedOption: ''
+            }
+        },
+        methods: {
+            hideButton(){
+                this.showButton = false
+            }
+        }
+    }
+</script>
+
 <template>
     <div className="side_panel_wrapper">
         <h1 className="name_h1">СПУТНИКИ</h1>
         <div className="get_data_wrapper">
             <div className="select_wrapper" >
-                <select className="custom_select" name="" id="">
-                    <option disabled selected hidden>Выберите спутник</option>
-                    <option value="">1</option>
+                <select v-model="selectedOption" className="custom_select" name="" id="">
+                    <option disabled value="">Выберите спутник</option>
+                    <option value="0">1</option>
                 </select>  
             </div>
-            <button className="button_get_data button_text">Нажмите для получения данных</button>
-            <img className='satellite_img' src="/src/components/icons/Satellite.svg" alt=""> 
+            <button 
+                v-if="selectedOption != ''"
+                v-show="showButton" @click="hideButton()"
+                className="button_get_data button_text">
+                Нажмите для получения данных
+            </button>
+            <button disabled v-else className="button_get_data button_text">Нажмите для получения данных</button>
+            <img v-if="showButton" className='satellite_img' src="/src/components/icons/Satellite.svg" alt=""> 
         </div>
     </div>
-
 </template>
 
 <style scoped>
