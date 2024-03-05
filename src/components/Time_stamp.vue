@@ -1,6 +1,21 @@
+<script>
+export  default{
+    data() {
+        return {
+             currentDate: new Date().toLocaleDateString(),
+        }
+  },
+    created(){
+        setInterval(() => {
+            this.currentDate = new Date().toLocaleDateString;
+        }, 86400000);
+    }
+}
+</script>
+
 <template>
     <div className="time_rectangle">
-        <p class= "name_time">2024-12-02 21:14:00 (UTC +3:00)</p>
+        <p class= "name_time">Обновлено: {{ currentDate }} 14:00:00 (UTC +3:00)</p>
     </div>
 </template>
 
@@ -11,7 +26,7 @@
     background: #bbe1ea;
     border-radius: 15px;
     padding: 7px 10px;
-    max-width: 300px;
+    max-width: 450px;
     margin: 0;
 }
 
