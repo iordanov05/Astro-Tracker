@@ -21,7 +21,6 @@ if response.status_code == 200:
     for group in grouped_lines:
         
         satellite = (f'"""{group}\n"""')
-        print(satellite)
         grouped_lines_array.append(textwrap.dedent(satellite).strip())
         
     
