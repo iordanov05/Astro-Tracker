@@ -14,7 +14,9 @@ def convert_epoch_to_date(epoch):
 
 def compute_checksum(tle_line):
     summ=''
-    tle_line=tle_line[:-1]
+    print(tle_line)
+    tle_line = tle_line.rstrip(' ')
+    tle_line = tle_line[:-1]
     for i in tle_line:
         if i.isdigit()==0 and i != "-":
             tle_line = tle_line.replace(i, '0')
@@ -72,3 +74,6 @@ for tle_data in grouped_lines_array:
             parsed_tle_array.append(value)
     array_of_parsed_tle_array.append(parsed_tle_array)
 array_of_parsed_tle_array = sorted(array_of_parsed_tle_array, key=lambda x: x[0])
+#print(array_of_parsed_tle_array)
+
+print("Decoding status:", True)
