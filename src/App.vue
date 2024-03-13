@@ -3,9 +3,10 @@ import Header_main from './components/Header_main.vue'
 import Map from './components/Map.vue'
 import Side_panel from './components/Side_panel.vue'
 import Time_stamp from './components/Time_stamp.vue'
+import Footer_inf from './components/Footer_inf.vue'
 
 export default{
-    components: {Header_main, Map, Side_panel, Time_stamp}
+    components: {Header_main, Map, Side_panel, Time_stamp, Footer_inf}
 }
 
 </script>
@@ -24,7 +25,7 @@ export default{
         </div>
     </main>
     <footer>
-
+        <Footer_inf></Footer_inf>
     </footer>
 </template>
 
