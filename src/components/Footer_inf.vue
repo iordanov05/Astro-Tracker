@@ -7,6 +7,7 @@
             </div>
             <p>Техническая поддержка</p>
         </div>
+        <p className="name_project">Astro Tracker</p>
          <div className="footer_information">
             <p>О сервисе</p>
             <p>Контакты</p>
@@ -45,6 +46,8 @@
 .footer_information{
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
     gap: 50px;
 }
 
@@ -75,6 +78,15 @@
     font-style: italic;
     color: #bbe1ea;
     font-size: 15px;
+    margin: 0;
 }
 
+.name_project{
+    font-family: 'Berlin Sans', sans-serif;
+    font-style: bold;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: 10px;
+    color: rgba(166, 201, 208, 0.4);
+}
 </style>
