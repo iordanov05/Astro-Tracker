@@ -11,10 +11,13 @@ import axios from 'axios'
             }
         },
         mounted(){
-                axios.get('/src/test_1.json')
+            axios.get('http://10.193.90.10:3000/api/data')
                 .then(response =>{
                     this.jsonData = response.data;
                     this.parseStringToArr(this.jsonData);
+                })
+                .catch(error => {
+                    console.error('Ошибка при запросе данных:', error);
                 });
         },
         computed: {
@@ -82,7 +85,7 @@ import axios from 'axios'
                 return "<b>Прямое восхождение восходящего узла: </b>" + this.jsonData[this.selectedOption-1]["raan"]
             }
         },
-         methods: {
+         methods: {        
             hideButton(){
                 this.showButton = false
             },
@@ -92,7 +95,7 @@ import axios from 'axios'
                     this.names.push(item["satellite_name"]);
                 }
             }
-        },
+        }
     }
 </script>
 
