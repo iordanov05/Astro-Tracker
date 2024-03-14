@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from tle import grouped_lines_array
-current_year = datetime.now().year
+current_year = datetime.now().year # Определение текущего года
 
+# Функция для преобразования эпохи в дату и время
 def convert_epoch_to_date(epoch):
     day_of_year = int(epoch.split('.')[0])
     fraction_of_day = float("0." + epoch.split('.')[1])
@@ -12,6 +13,7 @@ def convert_epoch_to_date(epoch):
     formatted_time = epoch_date.strftime("%H:%M:%S")
     return f"{formatted_date}, {formatted_time}"
 
+# Функция для вычисления контрольной суммы
 def compute_checksum(tle_line):
     summ=''
     print(tle_line)
@@ -25,6 +27,7 @@ def compute_checksum(tle_line):
     summ = str(sum(list(map(int, tle_line.strip()))))[-1]
     return summ
 
+# Функция для разбора TLE 
 def parse_tle(tle_text):
     t_lines = tle_text.split('\n')
     satellite_name = t_lines[0].strip()
@@ -63,6 +66,8 @@ def parse_tle(tle_text):
     return satellite_data
 
 array_of_parsed_tle_array = []
+
+# Цикл для обработки массива TLE строк
 for tle_data in grouped_lines_array:
     parsed_tle_array = []
     parsed_tle = parse_tle(tle_data)
@@ -73,7 +78,9 @@ for tle_data in grouped_lines_array:
         else:
             parsed_tle_array.append(value)
     array_of_parsed_tle_array.append(parsed_tle_array)
+   
+# Сортировка массива рассчитанных TLE данных 
 array_of_parsed_tle_array = sorted(array_of_parsed_tle_array, key=lambda x: x[0])
-#print(array_of_parsed_tle_array)
 
+# Вывод статуса декодирования
 print("Decoding status:", True)

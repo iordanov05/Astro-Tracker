@@ -26,5 +26,5 @@ if response.status_code == 200:
     
 else:
     print("Ошибка при получении данных:", response.status_code)
-#print(grouped_lines_array)
+    
 print("Receipt status:", True)
