@@ -1,5 +1,44 @@
 <script>
 export default {
+    data(){
+        return{
+            latitude: 0-12, // Широта точки
+            longitude: 0-35, // Долгота точки
+            pointX: 0,
+            pointY: 0,
+            imageSize: { width: 0, height: 0 },
+            wrapperWidth: 0,
+            wrapperHeight: 0,
+            coord: [],
+            interval: null,
+            infoPosition: { x: 0, y: 0 },
+            numb: null,
+            coordArray: [{'x': '16.4110', 'y': '-61.0711'}, {'x': '-51.4101', 'y': '44.1665'}, {'x': '25.2539', 'y': '138.8800'}, {'x': '23.2943', 'y': '-90.3513'}, {'x': '-51.6799', 'y': '6.7025'}, {'x': '18.4493', 'y': '109.4331'}, {'x': '29.8819', 'y': '-120.3075'}, {'x': '-50.1662', 'y': '-30.3695'}, {'x': '11.4329', 'y': '80.4932'}, {'x': '36.0314', 'y': '-151.2199'}, {'x': '-47.0603', 'y': '-66.1480'}, {'x': '4.2972', 'y': '51.8492'}, {'x': '41.5501', 'y': '176.5958'}, {'x': '-42.6802', 'y': '-100.2513'}, {'x': '-2.8793', 'y': '23.3143'}, {'x': '46.1811', 'y': '142.8448'}, {'x': '-37.3517', 'y': '-132.7417'}, {'x': '-10.0227', 'y': '-5.2887'}, {'x': '49.6065', 'y': '107.3986'}, {'x': '-31.3452', 'y': '-163.8929'}, {'x': '-17.0564', 'y': '-34.1423'}, {'x': '51.4971', 'y': '70.5277'}, {'x': '-24.8653', 'y': '165.9781'}, {'x': '-23.8927', 'y': '-63.4499'}, {'x': '51.6235', 'y': '33.0378'}, {'x': '-18.0631', 'y': '136.5830'}, {'x': '-30.4225', 'y': '-93.4487'}, {'x': '49.9706', 'y': '-3.9711'}, {'x': '-11.0526', 'y': '107.6771'}, {'x': '-36.5019', 'y': '-124.4194'}, {'x': '46.7461', 'y': '-39.6301'}, {'x': '-3.9244', 'y': '79.0526'}, {'x': '-41.9369', 'y': '-156.6744'}, {'x': '42.2744', 'y': '-73.6001'}, {'x': '3.2438', 'y': '50.5251'}, {'x': '-46.4695', 'y': '169.5015'}, {'x': '36.8800', 'y': '-105.9702'}, {'x': '10.3784', 'y': '21.9181'}, {'x': '-49.7836', 'y': '134.0018'}, {'x': '30.8289', 'y': '-137.0239'}, {'x': '17.4024', 'y': '-6.9514'}, {'x': '-51.5574', 'y': '97.1272'}, {'x': '24.3215', 'y': '-167.0781'}, {'x': '24.2268', 'y': '-36.2879'}, {'x': '-51.5755', 'y': '59.7024'}, {'x': '17.5059', 'y': '163.5817'}, {'x': '30.7404', 'y': '-66.3313'}, {'x': '-49.8367', 'y': '22.8128'}],
+            track: [],
+            isTrackShow: false,
+            chosenPoint: {pointX: null, pointY: null},
+            index_old: -1,
+        }
+    }, 
+    props: {
+        receivedLocation: {
+            type: Array,
+            required: true
+        }
+    },
+    watch: {
+        receivedLocation: {
+            handler() {
+                this.calculateCoordinates();
+                this.calculateTrack();
+        },
+        deep: true
+        }   
+    },
+    created() {
+        this.calculateCoordinates();
+        this.calculateTrack();
+    },
     mounted() {
         const tooltip = document.querySelector('.tooltip');
         const continents = document.querySelectorAll('.continent');
@@ -19,14 +58,146 @@ export default {
                 tooltip.style.display = 'none';
             });
         });
+
+        this.getImageSizeForImage();
+        this.interval = setInterval(this.calculateCoordinates, 3000);
+    },
+    methods: {
+        getImageSizeForImage(){
+            const image = new Image();
+            image.src = "/src/components/icons/acetone.png";
+            image.onload = () => {
+                const mapWrapper = this.$refs.mapWrapper;
+                this.wrapperWidth = mapWrapper.offsetWidth; // Ширина div
+                this.wrapperHeight = mapWrapper.offsetHeight; // Высота div
+            };
+        },
+        calculateCoordinates(){
+            this.coord = [];
+            for (let i = 0; i < this.receivedLocation.length; i++ ){
+                let newDict = {};
+                if (i === 0) {
+                    newDict['pointX'] = null;
+                    newDict['pointY'] = null;
+                } else{
+                    const lat = this.receivedLocation[i]['latitude'];
+                    const long = this.receivedLocation[i]['longitude'];
+                    newDict['pointX'] = (parseFloat(long)- 35 + 180) * (this.wrapperWidth / 360);
+                    newDict['pointY'] = (90 - parseFloat(lat) + 12) * (this.wrapperHeight / 180);   
+                    if (newDict['pointX']<0){
+                        newDict['pointX'] = newDict['pointX'] + this.wrapperWidth
+                    }
+                    if (newDict['pointX']>this.wrapperWidth-55){
+                        newDict['pointX']=this.wrapperWidth-55
+                    }
+                    // else {
+                    //     newDict['pointX'] = this.wrapperWidth- 50
+                    // }
+                    // if (Math.abs(newDict['pointX']) > (this.wrapperWidth / 2)){
+                    //     if (newDict['pointX'] < 0){
+                    //         
+                    //     } else {
+                    //         newDict['pointX'] = newDict['pointX'] - this.wrapperWidth
+                    //     }
+                    // }
+                } 
+                this.coord.push(newDict);
+            }
+        },  
+        calculateTrack(){
+            this.track = [];
+            if (this.receivedLocation && this.receivedLocation[0] && this.receivedLocation[0]['track']) {
+                for(let i = 0; i < this.receivedLocation[0]['track'].length; i++){
+                    let newDict = {};
+                    const lat = this.receivedLocation[0]['track'][i]['x'];
+                    const long = this.receivedLocation[0]['track'][i]['y'];
+                    newDict['pointX'] = (parseFloat(long)- 35 + 180) * (this.wrapperWidth / 360);
+                    newDict['pointY'] = (90 - parseFloat(lat) + 12) * (this.wrapperHeight / 180); 
+                    if (newDict['pointX']<0){
+                        newDict['pointX'] = newDict['pointX'] + this.wrapperWidth
+                    }
+                    if (newDict['pointX']>this.wrapperWidth-8){
+                        newDict['pointX']=this.wrapperWidth-8;
+                    };
+                    this.track.push(newDict);
+                }
+            }
+        },
+        showTrack(index){
+           if (this.index_old === -1){
+            this.index_old = index;
+           }
+           if (index === this.index_old){
+                this.isTrackShow = !this.isTrackShow; 
+           }
+           this.index_old = index;
+           this.calculateTrack();
+        },
+        calculateChosenPoint(data){
+            const lat = data.lat;
+            const long = data.long;
+            this.chosenPoint['pointX'] = (parseFloat(long)- 35 + 180) * (this.wrapperWidth / 360);
+            this.chosenPoint['pointY'] = (90 - parseFloat(lat)*1.15+12) * (this.wrapperHeight / 180)-30; 
+        },
+        satelliteClick(id){
+            const numbInitial = this.receivedLocation[id+1].numb_json_data;
+            const name = this.receivedLocation[id+1].satellite_name;
+            this.$emit("informationDisplay", numbInitial, name);
+        },
+        showInfo(index){
+            this.numb = index+1;
+        },
+        hideInfo(){
+            this.numb = null;
+        },
+        setPosition(event) {
+            this.infoPosition.x = event.clientX+20; 
+            this.infoPosition.y = event.clientY-60; 
+    }
+
+    },
+    beforeDestroy(){
+        clearInterval(this.interval);
     }
 }
 </script>
 
 <template>
-    <div className="wrapper">
-        <img className='map_wrapper' src="/src/components/icons/acetone.png" alt="Карта">
-        <svg viewBox="0 0 6686 3000">
+    <div>
+
+        <div className="wrapper">
+            <div id="app_map" ref="mapWrapper" @mousemove="setPosition">
+                <img className='map_wrapper' src="/src/components/icons/acetone.png" alt="Карта">
+                <transition-group name="points-transition" tag="div">
+                    <div v-for="(el, index) in coord.slice(1)" :key = "index"
+                       class="point"
+                        :style="{ top: el.pointY + 'px', left: el.pointX + 'px' }"
+                        @click=" () => {satelliteClick(index); showTrack(index); }"
+                        @mouseover="showInfo(index)"
+                        @mouseleave="hideInfo" 
+                    ></div>
+                </transition-group>
+                <div v-if="isTrackShow">
+                    <div v-for="(el, index) in track" :key="index"
+                        class="point_track"
+                        :style="{ top: el.pointY + 'px', left: el.pointX + 'px' }"
+                    ></div>
+                </div>
+                <div v-if="chosenPoint && chosenPoint.pointX !== null && chosenPoint.pointY !== null"
+                    class="point_locate"
+                    :style="{ top: chosenPoint.pointY + 'px', left: chosenPoint.pointX + 'px' }"
+                ></div>
+                <div v-if="numb" :style="{ top: infoPosition.y + 'px', left: infoPosition.x + 'px' }" className="info-window">
+                    <h3 className="h3_info">{{ receivedLocation[this.numb]['satellite_name']}}</h3>
+                    <div className="line"></div>
+                    <ul>
+                        <li>Широта: {{ receivedLocation[this.numb]['latitude'] }}°</li>
+                        <li>Долгота: {{ receivedLocation[this.numb]['longitude'] }}°</li>
+                        <li>Высота: {{ receivedLocation[this.numb]['height'] }}км</li>
+                    </ul>  
+                </div>
+            </div>            
+            <svg viewBox="0 0 6686 3000">
             <path data-title="Южная Америка" class="continent" d="m 1360.7678,1523.8775
 c -2.6838,0.5792 -5.5701,0.1669 -7.9844,-1.1407 -0.7493,-0.4058 -1.4642,-0.8985 -2.2812,-1.1406 -0.7393,-0.219 -1.542,-0.219 -2.2813,0 -0.01,-0.2608 -0.084,-0.5196 -0.2233,-0.74 -0.1395,-0.2203 -0.34,-0.4016 -0.5733,-0.5183 -0.2333,-0.1166 -0.4987,-0.1683 -0.7587,-0.1477 -0.26,0.021 -0.5139,0.1135 -0.7259,0.2654 -0.2194,0.1573 -0.3897,0.3721 -0.5607,0.581 -0.171,0.2089 -0.3499,0.4184 -0.58,0.5596 -0.3325,0.204 -0.7422,0.2456 -1.1307,0.2106 -0.3885,-0.035 -0.7668,-0.1406 -1.1505,-0.2106 -0.7522,-0.1373 -1.5291,-0.1373 -2.2813,0 -0.2072,-0.7155 -0.6742,-1.3528 -1.294,-1.766 -0.6198,-0.4132 -1.3876,-0.5992 -2.1278,-0.5153 -0.3881,0.044 -0.7655,0.1589 -1.1534,0.205 -0.1939,0.023 -0.391,0.029 -0.5841,-4e-4 -0.1931,-0.029 -0.3826,-0.094 -0.5438,-0.2046 -0.2241,-0.1532 -0.3815,-0.383 -0.5445,-0.6 -0.1631,-0.217 -0.3466,-0.4337 -0.5961,-0.5406 -0.1789,-0.077 -0.3795,-0.091 -0.5733,-0.072 -0.1938,0.018 -0.3831,0.068 -0.5723,0.1132 -0.1892,0.046 -0.3808,0.088 -0.5754,0.092 -0.1946,0 -0.3943,-0.032 -0.5603,-0.1333 -0.1872,-0.1146 -0.3186,-0.3047 -0.4018,-0.5079 -0.083,-0.2032 -0.1227,-0.4211 -0.1623,-0.637 -0.04,-0.216 -0.081,-0.4337 -0.166,-0.6359 -0.086,-0.2022 -0.2206,-0.3902 -0.4105,-0.5004 -0.1686,-0.098 -0.3697,-0.1281 -0.5645,-0.1186 -0.1947,0.01 -0.3854,0.056 -0.5744,0.1045 -0.1889,0.048 -0.3788,0.097 -0.5732,0.1116 -0.1945,0.014 -0.3959,-0.01 -0.5692,-0.098 -0.1211,-0.062 -0.2244,-0.1552 -0.3138,-0.258 -0.089,-0.1029 -0.1657,-0.2162 -0.2433,-0.3282 -0.078,-0.112 -0.157,-0.2235 -0.2514,-0.3216 -0.095,-0.098 -0.2053,-0.1832 -0.3321,-0.2329 -0.1786,-0.07 -0.3771,-0.066 -0.5678,-0.046 -0.1908,0.02 -0.3813,0.056 -0.5728,0.046 -0.2148,-0.011 -0.4238,-0.079 -0.6164,-0.1747 -0.1927,-0.096 -0.3705,-0.2183 -0.5448,-0.3443 -0.3486,-0.2521 -0.7007,-0.526 -1.1201,-0.6216 -0.4169,-0.095 -0.8554,-0 -1.2546,0.1521 -0.3991,0.1533 -0.7737,0.365 -1.1725,0.5192 -0.3988,0.1541 -0.8367,0.2498 -1.2541,0.1576 -0.2088,-0.046 -0.4087,-0.1401 -0.5677,-0.2828 -0.1591,-0.1428 -0.2757,-0.3357 -0.3136,-0.5461 -0.034,-0.1883 -0.01,-0.3814 0.018,-0.5714 0.023,-0.1899 0.039,-0.3865 -0.018,-0.5692 -0.066,-0.2113 -0.2255,-0.3844 -0.4135,-0.501 -0.188,-0.1166 -0.4033,-0.1818 -0.6193,-0.2294 -0.2161,-0.048 -0.4357,-0.079 -0.6497,-0.135 -0.2141,-0.056 -0.4252,-0.1379 -0.5987,-0.2752 -0.2372,-0.1877 -0.3891,-0.4695 -0.4549,-0.7647 -0.066,-0.2952 -0.05,-0.6038 0,-0.9013 0.1087,-0.595 0.3702,-1.1564 0.4509,-1.7559 0.1031,-0.7663 -0.095,-1.5361 -0.2189,-2.2992 -0.062,-0.3816 -0.1059,-0.7685 -0.084,-1.1544 0.022,-0.386 0.1116,-0.7729 0.3029,-1.1089 0.2196,-0.3856 0.5604,-0.6861 0.8256,-1.0419 0.1326,-0.1779 0.2474,-0.372 0.3114,-0.5844 0.064,-0.2125 0.075,-0.4449 0,-0.655 -0.088,-0.258 -0.2897,-0.4606 -0.5036,-0.6294 -0.214,-0.1688 -0.4477,-0.3151 -0.637,-0.5112 -0.1904,-0.1971 -0.3289,-0.4375 -0.4967,-0.6542 -0.084,-0.1083 -0.1758,-0.2113 -0.2825,-0.2973 -0.1067,-0.086 -0.2288,-0.1548 -0.3615,-0.1891 -0.1851,-0.048 -0.3802,-0.027 -0.57,-0 -0.1899,0.023 -0.3841,0.046 -0.5706,0 -0.1344,-0.03 -0.2599,-0.094 -0.3704,-0.1763 -0.1105,-0.082 -0.2066,-0.1826 -0.2929,-0.2899 -0.1727,-0.2147 -0.3075,-0.4576 -0.4773,-0.6745 -0.436,-0.557 -1.0907,-0.919 -1.7794,-1.0807 -0.6886,-0.1616 -1.4108,-0.1343 -2.1075,-0.012 -1.3935,0.2444 -2.7023,0.8585 -4.0975,1.0928 -0.3779,0.063 -0.7702,0.098 -1.1406,0 -0.4149,-0.1098 -0.7677,-0.3755 -1.1199,-0.6207 -0.3522,-0.2453 -0.7338,-0.4823 -1.1614,-0.5199 -0.1901,-0.017 -0.3811,0.01 -0.5713,0.023 -0.1902,0.016 -0.3844,0.024 -0.5693,-0.023 -0.2699,-0.069 -0.4995,-0.2517 -0.6757,-0.4675 -0.1763,-0.2158 -0.3056,-0.4651 -0.4372,-0.7107 -0.1317,-0.2455 -0.2687,-0.4917 -0.4571,-0.697 -0.1884,-0.2053 -0.4352,-0.3686 -0.7113,-0.406 -0.2036,-0.028 -0.4106,0.014 -0.6063,0.077 -0.1956,0.063 -0.3841,0.1463 -0.5807,0.2059 -0.1966,0.06 -0.4056,0.095 -0.6077,0.058 -0.101,-0.018 -0.1992,-0.055 -0.2844,-0.1127 -0.085,-0.057 -0.1572,-0.1355 -0.2021,-0.2279 -0.042,-0.087 -0.06,-0.1836 -0.062,-0.2799 -0,-0.096 0.01,-0.1923 0.025,-0.2874 0.031,-0.1902 0.074,-0.3842 0.037,-0.5734 -0.039,-0.2037 -0.1709,-0.3834 -0.341,-0.5022 -0.17,-0.1188 -0.376,-0.18 -0.5827,-0.1967 -0.4136,-0.033 -0.8211,0.099 -1.2119,0.2386 -0.3908,0.1392 -0.7814,0.2846 -1.1882,0.3659 -0.4068,0.081 -0.8238,0.094 -1.2387,0.094
 h -2.2813
@@ -1536,18 +1707,111 @@ h 0.8454
 c 0.2819,0 0.5644,-0.0219 0.8455,0 0.6635,0.0517 1.2901,0.45061 1.6177,1.02986 0.3276,0.57925 0.3466,1.3219 0.049,1.91711 -0.2976,0.59521 -0.9031,1.02562 -1.5631,1.11109 -0.6599,0.0855 -1.3551,-0.17652 -1.7945,-0.67629
 z"
             />
-        </svg>
-   </div>
-   <div className="tooltip">   </div>
+            </svg>
+        </div>
+        <div className="tooltip"></div>       
+        <img className="map_wrapper" src="./icons/extra.jpg">  
+    </div>
 </template>
 
 <style scoped>
 
+.info-window{
+    position: absolute;
+    z-index: 999;
+    border-radius: 15px;
+    box-shadow: 0 0 1000px rgba(0, 0, 0, 1);
+    background: rgb(155, 186, 193);
+}
+
+.h3_info{
+    margin: 10px;
+    font-family: 'Berlin Sans', sans-serif;
+    -webkit-text-stroke: 1px black; 
+    color: #17364b;
+    font-size: 20px;
+}
+
+ul{
+    margin: 10px;
+    padding: 0 0 0 20px;
+}
+
+li{
+    padding: 5px 10px;
+    font-family: 'Berlin Sans', sans-serif;
+    font-style: normal;
+    color: #fff;
+    -webkit-text-stroke: initial;
+    font-size: 17px;
+}
+
+.line{
+    width: 100%;
+    border-top: 4px solid #17364b; 
+}
+
+@keyframes grow-shrink {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.8);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.point {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: url("./icons/icons_sat.svg") no-repeat;
+    background-size: cover; 
+    z-index: 2;
+}
+
+.point_track{
+    position: absolute;
+    z-index: 1;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background: #ff8000;
+}
+
+.point_locate{
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: url("./icons/locator.svg") no-repeat;
+    background-size: cover; 
+    /* border-radius: 50%;
+    background: red; */
+    z-index: 1;
+}
+
+/* Применение анимации при добавлении */
+.points-transition-enter-active {
+    animation: grow-shrink 2s ease-in-out;
+}
+
+.points-transition-leave-active {
+    animation: grow-shrink 2s reverse ease-in-out;
+}
+
+.point:hover {
+    cursor: pointer;
+    width: 60px;
+    height: 60px
+}
+
 .map_wrapper{
-        max-width: 100%;
-        min-width: 500px;
-        display: flex;
-        align-items: center;
+    max-width: 100%;
+    min-width: 500px;
+    display: flex;
+    align-items: center;
 }
 
 .wrapper{
@@ -1591,6 +1855,13 @@ z"
     font-style: Italic;
     font-weight: 400;
     src: url('/src/components/Fonts/JournalSansItalic.ttf')
+}
+
+@font-face {
+    font-family: 'Berlin Sans' ;
+    font-style: bold;
+    font-weight: 700;
+    src: url('/src/components/Fonts/Berlin_Sans_FB_Demi_Bold.ttf')
 }
 
 .tooltip{

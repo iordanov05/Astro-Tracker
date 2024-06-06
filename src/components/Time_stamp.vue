@@ -7,15 +7,15 @@ export  default{
   },
     created(){
         setInterval(() => {
-            this.currentDate = new Date().toLocaleDateString;
-        }, 86400000);
+            this.currentDate = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+        })
     }
 }
 </script>
 
 <template>
     <div className="time_rectangle">
-        <p class= "name_time">Обновлено: {{ currentDate }} 14:00:00 (UTC +3:00)</p>
+        <p class= "name_time">Обновлено: {{ currentDate }} (UTC +3:00)</p>
     </div>
 </template>
 

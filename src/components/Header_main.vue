@@ -1,14 +1,64 @@
+<script>
+    export default{
+        props: {
+            receivedDistance: {
+                type: Array,
+                required: true,
+                default: null
+            }
+        },
+        methods: {
+            buttonClick(){
+                this.$emit("openMenu", true);
+            }
+        }
+    }
+</script>
+
 <template>
 <div className = "header_wrapper">
     <div className="header_wrapper_inside">
-        <img src=".\icons\hse_logo.png" alt="">
-         <h1 className="nameApp_h1">HSE&MIEM ASTRO TRACKER</h1>
+        <RouterLink to="/">
+            <img src=".\icons\icon.png" alt="">
+        </RouterLink>
+        <h1 className="nameApp_h1">HSE&MIEM ASTRO TRACKER</h1>
     </div>
-    <h1 className="inf_h1">Расстояние до МИЭМа: XXXXXX км</h1>
+    <div className="distance">
+        <button className="reload_button" @click="buttonClick()"></button>
+        <h1 className="inf_h1">
+            Расстояние до точки: {{ receivedDistance.length > 0 && receivedDistance[0] !== null && receivedDistance[0].distance !== null ? receivedDistance[0]['distance'] + ' км' : 'Нет данных'}}
+        </h1>
+    </div>
 </div> 
 </template>
 
 <style scoped>
+
+img{
+    width: 50px;
+    height: 50px;
+}
+
+.reload_button{
+    background: url('./icons/reload.svg') no-repeat; 
+    background-size: cover; 
+    width: 35px; 
+    height: 35px; 
+    border: none;
+}
+
+.reload_button:hover{
+    cursor: pointer; 
+    box-shadow: 0 0 6px 10px rgba(0, 0, 0, 0.25);
+}
+
+.distance{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 38%;
+}
+
 h1{
     margin: 0;
 }

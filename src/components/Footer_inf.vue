@@ -9,8 +9,12 @@
         </div>
         <p className="name_project">Astro Tracker</p>
          <div className="footer_information">
+            <RouterLink to="/service">
             <p>О сервисе</p>
-            <p>Контакты</p>
+            </RouterLink>
+            <RouterLink to="/contacts">
+                <p>Контакты</p>
+            </RouterLink>
             <p>Политика конфиденциальности</p>
         </div>
     </div>
@@ -26,6 +30,7 @@
     padding: 15px 50px 10px 50px;
     margin-top: 20px;
     box-shadow: 0 10px 20px 10px #17364b; 
+    bottom: 0;
 }
 
 .tech_support{
@@ -89,4 +94,15 @@
     letter-spacing: 10px;
     color: rgba(166, 201, 208, 0.4);
 }
+
+a {
+    text-decoration: none; 
+    color: inherit; 
+}
+
+a:active {
+    text-decoration: underline;
+    text-decoration-color: #bbe1ea;
+}
+
 </style>
